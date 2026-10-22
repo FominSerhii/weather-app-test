@@ -10,8 +10,16 @@ export const CityWeather: FunctionComponent<CityWeatherProps> = ({
     windSpeed,
     temp,
     date,
+    tempUnit,
+    windUnit,
+    onRemove,
 }) => (
     <div className="weather-tile">
+        {onRemove && (
+            <button type="button" className="remove-btn" aria-label={`Remove ${name}`} onClick={onRemove}>
+                <p style={{ margin: 0, marginBottom: `2px` }}>×</p>
+            </button>
+        )}
         <div className="header">
             <h2>
                 {name}, <span>{country}</span>
@@ -25,12 +33,12 @@ export const CityWeather: FunctionComponent<CityWeatherProps> = ({
                 alt=""
             />
             {temp.toFixed(1)}
-            <sup className="deg">&deg;C</sup>
+            <sup className="deg">{tempUnit}</sup>
         </div>
 
         <div className="des-wind">
             <p>{description.toUpperCase()}</p>
-            <p>Wind Speed: {windSpeed} m/s</p>
+            <p>Wind Speed: {windSpeed} {windUnit}</p>
         </div>
     </div>
 );

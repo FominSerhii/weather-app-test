@@ -1,3 +1,4 @@
+import { Units } from "./Units";
 import { WeatherResponse } from "./WeatherResponse";
 
 export type WeatherState = {
@@ -6,4 +7,5 @@ export type WeatherState = {
     failed: string[]; // cities that could not be loaded
     error: string | null;
     pendingCount: number; // how many cities are being fetched right now
+    units: Units;
 }

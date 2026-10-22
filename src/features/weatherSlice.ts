@@ -2,8 +2,10 @@ import {
     createAsyncThunk,
     createSelector,
     createSlice,
+    PayloadAction
 } from '@reduxjs/toolkit';
 
+import { Units } from '../types/Units';
 import { WeatherState } from '../types/WeatherState';
 import { WeatherResponse } from '../types/WeatherResponse';
 
@@ -12,12 +14,13 @@ import { toCityWeatherProps } from '../utils/weatherMapper';
 
 import { fetchCityWeather, CityNotFoundError } from '../services/weatherApi';
 
-const initialState: WeatherState = {
+export const initialState: WeatherState = {
     data: [],
     loading: false,
     failed: [],
     error: null,
-    pendingCount: 0
+    pendingCount: 0,
+    units: 'metric',
 };
 
 type FetchResult = { data: WeatherResponse[]; failed: string[] };
@@ -47,7 +50,14 @@ export const fetchWeather = createAsyncThunk<FetchResult, string, { rejectValue:
 const weatherSlice = createSlice({
     name: 'weather',
     initialState,
-    reducers: {},
+    reducers: {
+        cityRemoved(state, action: PayloadAction<number>) {
+            state.data = state.data.filter((c) => c.id !== action.payload);
+        },
+        unitsChanged(state, action: PayloadAction<Units>) {
+            state.units = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchWeather.pending, (state, action) => {
@@ -76,11 +86,19 @@ export default weatherSlice.reducer;
 // selectors
 type Slice = { weather: WeatherState };
 
+export const selectUnits = (s: Slice) => s.weather.units;
 export const selectLoading = (s: Slice) => s.weather.loading;
 export const selectFailed = (s: Slice) => s.weather.failed;
 export const selectError = (s: Slice) => s.weather.error;
 export const selectPendingCount = (s: Slice) => s.weather.pendingCount;
 export const selectCities = createSelector(
-    (s: Slice) => s.weather.data,
-    (data) => data.map(toCityWeatherProps)
+    [
+        (state: Slice) => state.weather.data,
+        (state: Slice) => state.weather.units,
+    ],
+    (weatherData, units) =>
+        weatherData.map((response) =>
+            toCityWeatherProps(response, units),
+        ),
 );
+export const { cityRemoved, unitsChanged } = weatherSlice.actions;
