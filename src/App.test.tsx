@@ -2,12 +2,19 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import Weather from './components/Weather';
 import { restoreSession, setupStore } from './features/store';
-import { CityNotFoundError, fetchCityWeather } from './services/weatherApi';
+import { CityNotFoundError, fetchCityWeather, fetchWeatherByCoords } from './services/weatherApi';
 import { WeatherResponse } from './types/WeatherResponse';
+import { GeolocationError, getCurrentCoordinates } from './services/geolocation';
 
 jest.mock('./services/weatherApi', () => ({
   ...jest.requireActual('./services/weatherApi'),
   fetchCityWeather: jest.fn(),
+  fetchWeatherByCoords: jest.fn(),
+}));
+
+jest.mock('./services/geolocation', () => ({
+  ...jest.requireActual('./services/geolocation'),
+  getCurrentCoordinates: jest.fn(),
 }));
 
 const fake = (name: string, id: number) =>
@@ -104,4 +111,30 @@ test('shows local time, details and a weather theme on the tile', async () => {
   expect(screen.getByText('08:40')).toBeInTheDocument(); // sunrise
   expect(screen.getByText('18:00')).toBeInTheDocument(); // sunset
   expect(container.querySelector('.weather-tile')).toHaveClass('theme-clear-day');
+});
+
+test('shows weather for the current location and saves the city', async () => {
+  (getCurrentCoordinates as jest.Mock).mockResolvedValue({ lat: 48.15, lon: 17.11 });
+  (fetchWeatherByCoords as jest.Mock).mockResolvedValue(fake('Bratislava', 1));
+
+  renderWeather();
+  fireEvent.click(screen.getByRole('button', { name: /use my location/i }));
+
+  expect(await screen.findByText(/Bratislava/)).toBeInTheDocument();
+  expect(fetchWeatherByCoords).toHaveBeenCalledWith({ lat: 48.15, lon: 17.11 });
+  expect(JSON.parse(localStorage.getItem('weather-app:cities')!)).toEqual(['Bratislava']);
+});
+
+test('explains a denied location request and keeps existing tiles', async () => {
+  (fetchCityWeather as jest.Mock).mockResolvedValue(fake('Paris', 2));
+  (getCurrentCoordinates as jest.Mock).mockRejectedValue(new GeolocationError('denied'));
+
+  renderWeather();
+  search('Paris');
+  await screen.findByText(/Paris/);
+
+  fireEvent.click(screen.getByRole('button', { name: /use my location/i }));
+
+  expect(await screen.findByText(/location access was denied/i)).toBeInTheDocument();
+  expect(screen.getByText(/Paris/)).toBeInTheDocument();
 });

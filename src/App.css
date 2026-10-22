@@ -231,7 +231,6 @@ h2 {
 .unit-toggle {
   display: inline-flex;
   align-self: center;
-  margin-top: 12px;
   border: 2px solid #6d8c6d;
   border-radius: 20px;
   overflow: hidden;
@@ -319,6 +318,38 @@ h2 {
 
 .weather-tile {
   transition: background-color 0.3s ease;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.locate-btn {
+  padding: 6px 16px;
+  border: 2px solid #6d8c6d;
+  border-radius: 20px;
+  background: white;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.locate-btn:hover:not(:disabled) {
+  background: #eef4ee;
+}
+
+.locate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.locate-btn:focus-visible {
+  outline: 3px solid #1e2432;
+  outline-offset: 2px;
 }
 
 @media (max-width: 540px) {

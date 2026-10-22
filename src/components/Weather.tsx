@@ -16,13 +16,16 @@ import {
   selectPendingCount,
   cityRemoved,
   selectUnits,
-  unitsChanged
+  unitsChanged,
+  fetchWeatherByLocation
 } from '../features/weatherSlice';
 
 import { CityWeather } from './CityWeather';
 import { SearchBar } from './SearchBar';
 import { CityWeatherSkeleton } from './CityWeatherSkeleton';
 import { EmptyState } from './EmptyState';
+import { LocationButton } from './LocationButton';
+
 
 const MAX_SKELETONS = 5;
 const Weather: FunctionComponent = () => {
@@ -33,7 +36,9 @@ const Weather: FunctionComponent = () => {
   const error = useAppSelector(selectError);
   const pendingCount = useAppSelector(selectPendingCount);
   const units = useAppSelector(selectUnits);
-
+  const locate = () => {
+    dispatch(fetchWeatherByLocation());
+  };
   const search = (query: string) => {
     dispatch(fetchWeather(query));
   };
@@ -51,7 +56,14 @@ const Weather: FunctionComponent = () => {
       </h1>
 
       <SearchBar onSearch={search} />
-      <UnitToggle units={units} onChange={(u) => dispatch(unitsChanged(u))} />
+      <div className="controls">
+        <LocationButton
+          onLocate={locate}
+          disabled={loading} />
+        <UnitToggle
+          units={units}
+          onChange={(u) => dispatch(unitsChanged(u))} />
+      </div>
       {isEmpty && <EmptyState onTry={search} />}
 
       <div aria-live="polite" aria-busy={loading}>

@@ -12,7 +12,16 @@ import { WeatherResponse } from '../types/WeatherResponse';
 import { parseCities } from '../utils/parseCities';
 import { toCityWeatherProps } from '../utils/weatherMapper';
 
-import { fetchCityWeather, CityNotFoundError } from '../services/weatherApi';
+import {
+    fetchCityWeather,
+    CityNotFoundError,
+    fetchWeatherByCoords
+} from '../services/weatherApi';
+import {
+    GEOLOCATION_MESSAGES,
+    GeolocationError,
+    getCurrentCoordinates,
+} from '../services/geolocation';
 
 export const initialState: WeatherState = {
     data: [],
@@ -24,6 +33,7 @@ export const initialState: WeatherState = {
 };
 
 type FetchResult = { data: WeatherResponse[]; failed: string[] };
+const SERVICE_ERROR = 'Weather service error. Check your API key or connection.';
 
 export const fetchWeather = createAsyncThunk<FetchResult, string, { rejectValue: string }>(
     'weather/fetchWeather',
@@ -44,6 +54,21 @@ export const fetchWeather = createAsyncThunk<FetchResult, string, { rejectValue:
             }
         }
         return { data, failed };
+    }
+);
+
+export const fetchWeatherByLocation = createAsyncThunk<WeatherResponse, void, { rejectValue: string }>(
+    'weather/fetchWeatherByLocation',
+    async (_, { rejectWithValue }) => {
+        try {
+            const coordinates = await getCurrentCoordinates();
+            return await fetchWeatherByCoords(coordinates);
+        } catch (e) {
+            if (e instanceof GeolocationError) {
+                return rejectWithValue(GEOLOCATION_MESSAGES[e.reason]);
+            }
+            return rejectWithValue(SERVICE_ERROR);
+        }
     }
 );
 
@@ -75,6 +100,23 @@ const weatherSlice = createSlice({
             .addCase(fetchWeather.rejected, (state, action) => {
                 state.loading = false;
                 state.data = [];
+                state.pendingCount = 0;
+                state.error = action.payload ?? 'Unexpected error';
+            })
+            .addCase(fetchWeatherByLocation.pending, (state) => {
+                state.loading = true;
+                state.failed = [];
+                state.error = null;
+                state.pendingCount = 1;
+            })
+            .addCase(fetchWeatherByLocation.fulfilled, (state, { payload }) => {
+                state.loading = false;
+                state.data = [payload];
+                state.failed = [];
+                state.pendingCount = 0;
+            })
+            .addCase(fetchWeatherByLocation.rejected, (state, action) => {
+                state.loading = false;
                 state.pendingCount = 0;
                 state.error = action.payload ?? 'Unexpected error';
             });
