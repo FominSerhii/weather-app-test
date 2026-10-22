@@ -79,11 +79,14 @@ h2 {
 
 /* Error message */
 .error-message {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   color: rgb(20, 2, 2);
   font-size: 30px;
-  margin-top: auto;
+  margin: 2em;
+  gap: 12px;
 }
 
 /* weather tile */

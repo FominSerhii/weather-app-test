@@ -5,4 +5,5 @@ export type CityWeatherProps = {
   icon: string;
   windSpeed: number;
   temp: number;
+  date: string;
 };

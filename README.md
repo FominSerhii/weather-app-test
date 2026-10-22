@@ -6,6 +6,14 @@ Podla toho ci vypracovavate toto zadanie na pohovore, alebo doma, vypracujte tod
 
 Depending on whether you are working on this task during an interview or at home, complete todo-on-site.md or todo-home.md.
 
+## API Key
+The provided OpenWeatherMap API key is used as a fallback to allow reviewers to run the application immediately without additional configuration. In a production application, the key would be managed through environment-specific configuration rather than hardcoded in the source code.
+
+To override the default key, create a .env.local file:
+
+REACT_APP_OWM_API_KEY=your_api_key
+
+In the project directory, you can run:
 
 ## Available Scripts
 

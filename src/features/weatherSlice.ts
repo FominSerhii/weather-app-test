@@ -1,41 +1,40 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import {WeatherResponse} from "../types/WeatherResponse";
-import {WeatherState} from "../types/WeatherState";
+import {
+    createAsyncThunk,
+    createSelector,
+    createSlice,
+} from '@reduxjs/toolkit';
 
+import { WeatherState } from '../types/WeatherState';
+import { WeatherResponse } from '../types/WeatherResponse';
+
+import { parseCities } from '../utils/parseCities';
+import { toCityWeatherProps } from '../utils/weatherMapper';
+
+import { fetchCityWeather } from '../services/weatherApi';
 
 const initialState: WeatherState = {
     data: [],
     loading: false,
-    error: false,
+    failed: []
 };
 
-// axios call
-export const fetchWeather = createAsyncThunk(
+type FetchResult = { data: WeatherResponse[]; failed: string[] };
+
+export const fetchWeather = createAsyncThunk<FetchResult, string>(
     'weather/fetchWeather',
-    async (citiesQuery: string) => {
-        const cities = citiesQuery.split(',').map((c) => c.trim()).filter(Boolean);
-        if (cities.length === 0) return [];
+    async (query) => {
+        const cities = parseCities(query);
+        const results = await Promise.allSettled(cities.map(fetchCityWeather));
 
-        const url = 'https://api.openweathermap.org/data/2.5/weather';
-        const appid = 'f00c38e0279b7bc85480c3fe775d518c';
-
-        const requests = cities.map((city) =>
-            axios.get(url, {
-                params: {
-                    q: city,
-                    units: 'metric',
-                    appid: appid,
-                }
-            })
+        const data: WeatherResponse[] = [];
+        const failed: string[] = [];
+        results.forEach((r, i) =>
+            r.status === 'fulfilled' ? data.push(r.value) : failed.push(cities[i])
         );
-
-        const responses = await Promise.all(requests);
-        return responses.map((res) => res.data); // Returns WeatherResponse[]
+        return { data, failed };
     }
 );
 
-// state transitions
 const weatherSlice = createSlice({
     name: 'weather',
     initialState,
@@ -44,18 +43,27 @@ const weatherSlice = createSlice({
         builder
             .addCase(fetchWeather.pending, (state) => {
                 state.loading = true;
-                state.error = false;
+                state.failed = [];
             })
-            .addCase(fetchWeather.fulfilled, (state, action: PayloadAction<WeatherResponse[]>) => {
+            .addCase(fetchWeather.fulfilled, (state, { payload }) => {
                 state.loading = false;
-                state.data = action.payload;
+                state.data = payload.data;
+                state.failed = payload.failed;
             })
             .addCase(fetchWeather.rejected, (state) => {
                 state.loading = false;
-                state.error = true;
                 state.data = [];
             });
     },
 });
 
 export default weatherSlice.reducer;
+
+// selectors
+type Slice = { weather: WeatherState };
+export const selectLoading = (s: Slice) => s.weather.loading;
+export const selectFailed = (s: Slice) => s.weather.failed;
+export const selectCities = createSelector(
+    (s: Slice) => s.weather.data,
+    (data) => data.map(toCityWeatherProps)
+);

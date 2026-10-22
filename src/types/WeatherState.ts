@@ -1,7 +1,7 @@
-import {WeatherResponse} from "./WeatherResponse";
+import { WeatherResponse } from "./WeatherResponse";
 
-export type  WeatherState = {
+export type WeatherState = {
     data: WeatherResponse[];
     loading: boolean;
-    error: boolean;
+    failed: string[]; // cities that could not be loaded
 }
