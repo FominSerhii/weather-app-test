@@ -12,8 +12,14 @@ jest.mock('./services/weatherApi', () => ({
 
 const fake = (name: string, id: number) =>
 ({
-  id, name, sys: { country: 'XX' }, weather: [{ description: 'clear sky', icon: '01d' }],
-  wind: { speed: 3 }, main: { temp: 20 }
+  id,
+  name,
+  dt: 1700000000,
+  timezone: 3600,
+  sys: { country: 'XX' },
+  weather: [{ main: 'Clear', description: 'clear sky', icon: '01d' }],
+  wind: { speed: 3 },
+  main: { temp: 20 }
 } as unknown as WeatherResponse);
 
 const renderWeather = (store = setupStore()) =>
@@ -86,4 +92,16 @@ test('saves searched cities and restores them on startup', async () => {
 
   expect(await screen.findByText(/Paris/)).toBeInTheDocument();
   expect(screen.getByText(/Berlin/)).toBeInTheDocument();
+});
+
+test('shows local time, details and a weather theme on the tile', async () => {
+  const { container } = renderWeather();
+  search('Paris');
+  await screen.findByText(/Paris/);
+
+  expect(screen.getByText(/23:13/)).toBeInTheDocument(); // dt 22:13 UTC + 1h
+  expect(screen.getByText('50%')).toBeInTheDocument();
+  expect(screen.getByText('08:40')).toBeInTheDocument(); // sunrise
+  expect(screen.getByText('18:00')).toBeInTheDocument(); // sunset
+  expect(container.querySelector('.weather-tile')).toHaveClass('theme-clear-day');
 });

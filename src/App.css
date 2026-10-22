@@ -77,7 +77,7 @@ h2 {
 .icon-temp {
   font-size: 4rem;
   font-weight: 700;
-  color: #1e2432;
+  color: var(--tile-fg, #1e2432);
   text-align: center;
 }
 
@@ -117,7 +117,8 @@ h2 {
   border-radius: 0.5em;
   display: flex;
   flex-direction: column;
-  background-color: #6d8c6d;
+  background-color: var(--tile-bg, #6d8c6d);
+  color: var(--tile-fg, inherit);
   margin: 2em;
   position: relative;
 }
@@ -212,7 +213,7 @@ h2 {
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.25);
-  color: #1e2432;
+  color: var(--tile-fg, #1e2432);
   font-size: 1.2em;
   line-height: 1;
   cursor: pointer;
@@ -254,6 +255,79 @@ h2 {
   outline-offset: -3px;
 }
 
+.details {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 1em 2em 1.5em;
+  padding: 0;
+  text-align: center;
+}
+
+.details>div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.details dt {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* weather themes */
+.weather-tile.theme-clear-day {
+  --tile-bg: #f2c94c;
+  --tile-fg: #1e2432;
+}
+
+.weather-tile.theme-clear-night {
+  --tile-bg: #1e2a44;
+  --tile-fg: #f5f7fa;
+}
+
+.weather-tile.theme-clouds {
+  --tile-bg: #8fa3b3;
+  --tile-fg: #14202b;
+}
+
+.weather-tile.theme-rain {
+  --tile-bg: #4f6d8a;
+  --tile-fg: #ffffff;
+}
+
+.weather-tile.theme-snow {
+  --tile-bg: #dbe8f1;
+  --tile-fg: #1e2432;
+}
+
+.weather-tile.theme-thunderstorm {
+  --tile-bg: #3d3a56;
+  --tile-fg: #ffffff;
+}
+
+.weather-tile.theme-mist {
+  --tile-bg: #b8bfc4;
+  --tile-fg: #1e2432;
+}
+
+.weather-tile {
+  transition: background-color 0.3s ease;
+}
+
+@media (max-width: 540px) {
+  .details {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 1em;
+  }
+}
+
 @keyframes shimmer {
   to {
     background-position: -200% 0;
@@ -267,6 +341,10 @@ h2 {
 
   .skeleton-line {
     animation: none;
+  }
+
+  .weather-tile {
+    transition: none;
   }
 }
 
