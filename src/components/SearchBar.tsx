@@ -15,15 +15,25 @@ export const SearchBar: FunctionComponent<Props> = ({ onSearch }) => {
 
     return (
         <div className="search-bar">
+            <label htmlFor="city-search" className="visually-hidden">
+                City names, separated by commas
+            </label>
             <input
+                id="city-search"
                 type="text"
                 className="city-search"
                 placeholder="Search City.."
                 name="query"
+                autoComplete="off"
+                enterKeyHint="search"
+                aria-describedby="city-search-hint"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
+            <p id="city-search-hint" className="search-hint">
+                Separate multiple cities with commas
+            </p>
         </div>
     );
 };

@@ -22,7 +22,7 @@ export const CityWeather: FunctionComponent<CityWeatherProps> = ({
         <div className="icon-temp">
             <img
                 src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-                alt={description}
+                alt=""
             />
             {temp.toFixed(1)}
             <sup className="deg">&deg;C</sup>
