@@ -22,7 +22,11 @@ export const CityWeather: FunctionComponent<CityWeatherProps> = ({
 }) => (
     <div className={`weather-tile theme-${theme}`}>
         {onRemove && (
-            <button type="button" className="remove-btn" aria-label={`Remove ${name}`} onClick={onRemove}>
+            <button
+                type="button"
+                className="remove-btn"
+                aria-label={`Remove ${name}`}
+                onClick={onRemove}>
                 <p style={{ margin: 0, marginBottom: `2px` }}>×</p>
             </button>
         )}

@@ -6,7 +6,8 @@ import { WeatherState } from '../types/WeatherState';
 import {
     cityRemoved,
     fetchWeather,
-    unitsChanged
+    unitsChanged,
+    fetchWeatherByLocation
 } from './weatherSlice';
 import {
     saveCities,
@@ -19,7 +20,7 @@ export const createPersistenceMiddleware = () => {
     const listener = createListenerMiddleware();
 
     listener.startListening({
-        matcher: isAnyOf(fetchWeather.fulfilled, cityRemoved),
+        matcher: isAnyOf(fetchWeather.fulfilled, cityRemoved, fetchWeatherByLocation.fulfilled),
         effect: (_action, api) => {
             const { weather } = api.getState() as Slice;
             saveCities(weather.data.map((c) => c.name));
