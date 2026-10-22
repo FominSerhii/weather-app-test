@@ -1,11 +1,30 @@
-import { configureStore } from '@reduxjs/toolkit';
-import weatherReducer from './weatherSlice';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import weatherReducer, { fetchWeather, initialState } from './weatherSlice';
+import { createPersistenceMiddleware } from './persistence';
+import { loadCities, loadUnits } from '../utils/storage';
 
-export const store = configureStore({
-    reducer: {
-        weather: weatherReducer,
-    },
+const rootReducer = combineReducers({ weather: weatherReducer });
+
+export type WeatherRootState = ReturnType<typeof rootReducer>;
+
+export const setupStore = (preloadedState?: Partial<WeatherRootState>) =>
+    configureStore({
+        reducer: rootReducer,
+        preloadedState,
+        middleware: (getDefault) => getDefault().prepend(createPersistenceMiddleware()),
+    });
+
+export type WeatherStore = ReturnType<typeof setupStore>;
+export type WeatherDispatch = WeatherStore['dispatch'];
+
+export const store = setupStore({
+    weather: { ...initialState, units: loadUnits() },
 });
 
-export type WeatherRootState = ReturnType<typeof store.getState>;
-export type WeatherDispatch = typeof store.dispatch;
+// Refetch the cities saved in the previous session
+export const restoreSession = (target: WeatherStore = store): void => {
+    const saved = loadCities();
+    if (saved.length > 0) {
+        target.dispatch(fetchWeather(saved.join(',')));
+    }
+};

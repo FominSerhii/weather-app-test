@@ -6,4 +6,7 @@ export type CityWeatherProps = {
   windSpeed: number;
   temp: number;
   date: string;
+  tempUnit: string; // '°C'|'°F'
+  windUnit: string; // 'm/s'|'mph'
+  onRemove?: () => void;
 };

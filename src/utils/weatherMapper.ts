@@ -1,12 +1,39 @@
-import { WeatherResponse } from '../types/WeatherResponse';
 import { CityWeatherProps } from '../types/CityWeather';
+import { Units } from '../types/Units';
+import { WeatherResponse } from '../types/WeatherResponse';
 
-export const toCityWeatherProps = (r: WeatherResponse): Omit<CityWeatherProps, 'date'> & { id: number } => ({
-    id: r.id,
-    name: r.name,
-    country: r.sys.country,
-    description: r.weather[0].description,
-    icon: r.weather[0].icon,
-    windSpeed: r.wind.speed,
-    temp: r.main.temp,
-});
+type CityWeatherData = Omit<
+    CityWeatherProps,
+    'date' | 'onRemove'
+> & {
+    id: number;
+};
+
+const toFahrenheit = (celsius: number): number =>
+    (celsius * 9) / 5 + 32;
+
+const toMph = (metersPerSecond: number): number =>
+    Math.round(metersPerSecond * 2.236936 * 10) / 10;
+
+export const toCityWeatherProps = (
+    response: WeatherResponse,
+    units: Units = 'metric',
+): CityWeatherData => {
+    const isImperial = units === 'imperial';
+
+    return {
+        id: response.id,
+        name: response.name,
+        country: response.sys.country,
+        description: response.weather[0].description,
+        icon: response.weather[0].icon,
+        temp: isImperial
+            ? toFahrenheit(response.main.temp)
+            : response.main.temp,
+        windSpeed: isImperial
+            ? toMph(response.wind.speed)
+            : response.wind.speed,
+        tempUnit: isImperial ? '°F' : '°C',
+        windUnit: isImperial ? 'mph' : 'm/s',
+    };
+};

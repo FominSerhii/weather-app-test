@@ -106,8 +106,8 @@ h2 {
 .weather-tile {
 
   .header {
-    padding-left: 2em;
-    padding-right: 2em;
+    padding-left: 3em;
+    padding-right: 3em;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -119,6 +119,7 @@ h2 {
   flex-direction: column;
   background-color: #6d8c6d;
   margin: 2em;
+  position: relative;
 }
 
 .visually-hidden {
@@ -199,6 +200,58 @@ h2 {
   height: 1em;
   width: 70%;
   align-self: center;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  color: #1e2432;
+  font-size: 1.2em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.remove-btn:focus-visible {
+  outline: 3px solid #1e2432;
+  outline-offset: 2px;
+}
+
+.unit-toggle {
+  display: inline-flex;
+  align-self: center;
+  margin-top: 12px;
+  border: 2px solid #6d8c6d;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.unit-toggle button {
+  border: none;
+  background: white;
+  padding: 6px 16px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.unit-toggle button[aria-pressed='true'] {
+  background: #6d8c6d;
+  color: white;
+}
+
+.unit-toggle button:focus-visible {
+  outline: 3px solid #1e2432;
+  outline-offset: -3px;
 }
 
 @keyframes shimmer {

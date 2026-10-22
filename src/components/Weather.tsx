@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFrown } from '@fortawesome/free-solid-svg-icons';
 
+import { UnitToggle } from './UnitToggle';
 import {
   useAppDispatch,
   useAppSelector,
@@ -13,6 +14,9 @@ import {
   selectLoading,
   selectError,
   selectPendingCount,
+  cityRemoved,
+  selectUnits,
+  unitsChanged
 } from '../features/weatherSlice';
 
 import { toDate } from '../utils/date';
@@ -22,7 +26,6 @@ import { CityWeatherSkeleton } from './CityWeatherSkeleton';
 import { EmptyState } from './EmptyState';
 
 const MAX_SKELETONS = 5;
-
 const Weather: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const cities = useAppSelector(selectCities);
@@ -30,6 +33,7 @@ const Weather: FunctionComponent = () => {
   const loading = useAppSelector(selectLoading);
   const error = useAppSelector(selectError);
   const pendingCount = useAppSelector(selectPendingCount);
+  const units = useAppSelector(selectUnits);
   const today = toDate();
 
   const search = (query: string) => {
@@ -49,6 +53,7 @@ const Weather: FunctionComponent = () => {
       </h1>
 
       <SearchBar onSearch={search} />
+      <UnitToggle units={units} onChange={(u) => dispatch(unitsChanged(u))} />
       {isEmpty && <EmptyState onTry={search} />}
 
       <div aria-live="polite" aria-busy={loading}>
@@ -99,6 +104,7 @@ const Weather: FunctionComponent = () => {
             key={city.id}
             {...city}
             date={today}
+            onRemove={() => dispatch(cityRemoved(city.id))}
           />
         ))}
       </div>
