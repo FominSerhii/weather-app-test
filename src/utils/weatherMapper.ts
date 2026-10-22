@@ -1,13 +1,9 @@
-import { CityWeatherProps } from '../types/CityWeather';
+import { CityWeatherView } from '../types/CityWeather';
 import { Units } from '../types/Units';
 import { WeatherResponse } from '../types/WeatherResponse';
+import { formatCityDate, formatCityTime } from './date';
+import { toTheme } from './weatherTheme';
 
-type CityWeatherData = Omit<
-    CityWeatherProps,
-    'date' | 'onRemove'
-> & {
-    id: number;
-};
 
 const toFahrenheit = (celsius: number): number =>
     (celsius * 9) / 5 + 32;
@@ -18,8 +14,9 @@ const toMph = (metersPerSecond: number): number =>
 export const toCityWeatherProps = (
     response: WeatherResponse,
     units: Units = 'metric',
-): CityWeatherData => {
+): CityWeatherView => {
     const isImperial = units === 'imperial';
+    const condition = response.weather[0];
 
     return {
         id: response.id,
@@ -35,5 +32,12 @@ export const toCityWeatherProps = (
             : response.wind.speed,
         tempUnit: isImperial ? '°F' : '°C',
         windUnit: isImperial ? 'mph' : 'm/s',
+        feelsLike: isImperial ? toFahrenheit(response.main.feels_like) : response.main.feels_like,
+        humidity: response.main.humidity,
+        sunrise: formatCityTime(response.sys.sunrise, response.timezone),
+        sunset: formatCityTime(response.sys.sunset, response.timezone),
+        date: formatCityDate(response.dt, response.timezone),
+        time: formatCityTime(response.dt, response.timezone),
+        theme: toTheme(condition.main, condition.icon),
     };
 };

@@ -1,3 +1,5 @@
+import { WeatherTheme } from './WeatherTheme';
+
 export type CityWeatherProps = {
   name: string;
   country: string;
@@ -6,7 +8,15 @@ export type CityWeatherProps = {
   windSpeed: number;
   temp: number;
   date: string;
+  time: string;
   tempUnit: string; // '°C'|'°F'
   windUnit: string; // 'm/s'|'mph'
+  feelsLike: number;
+  humidity: number;
+  sunrise: string;
+  sunset: string;
+  theme: WeatherTheme;
   onRemove?: () => void;
 };
+
+export type CityWeatherView = Omit<CityWeatherProps, 'onRemove'> & { id: number };

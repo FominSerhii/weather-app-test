@@ -19,7 +19,6 @@ import {
   unitsChanged
 } from '../features/weatherSlice';
 
-import { toDate } from '../utils/date';
 import { CityWeather } from './CityWeather';
 import { SearchBar } from './SearchBar';
 import { CityWeatherSkeleton } from './CityWeatherSkeleton';
@@ -34,7 +33,6 @@ const Weather: FunctionComponent = () => {
   const error = useAppSelector(selectError);
   const pendingCount = useAppSelector(selectPendingCount);
   const units = useAppSelector(selectUnits);
-  const today = toDate();
 
   const search = (query: string) => {
     dispatch(fetchWeather(query));
@@ -103,7 +101,6 @@ const Weather: FunctionComponent = () => {
           <CityWeather
             key={city.id}
             {...city}
-            date={today}
             onRemove={() => dispatch(cityRemoved(city.id))}
           />
         ))}
